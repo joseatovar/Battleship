@@ -28,6 +28,15 @@ function parseGuess(guess)
 	}
 	return null;
 }
+function fireOnPosition(location)
+{
+	controller.guesses++;
+	var hit = model.fire(location);
+	if (hit && model.shipsSunk === model.numShips) 
+	{
+		view.displayMessage("You sank all my battleships, in " + controller.guesses + " guesses");
+	}
+}
 
 var view = {
 	
@@ -156,18 +165,23 @@ var controller = {
 		var location = parseGuess(guess);
 		if (location) 
 		{
-			this.guesses++;
-			var hit = model.fire(location);
-			if (hit && model.shipsSunk === model.numShips) 
-			{
-				view.displayMessage("You sank all my battleships, in " + this.guesses + " guesses");
-			}
+			fireOnPosition(location);
 		}
 	}
 	
 	
 };
-
+function clickEventTable()
+{
+	var cells = document.getElementsByTagName("td");
+	for(var i=0; i<cells.length; i++)
+	{
+		cells[i].onclick = function(){
+										return clickFire(this.id);
+								};
+			
+	}
+}
 function init() 
 {
 	var fireButton = document.getElementById("fireButton");
@@ -175,6 +189,7 @@ function init()
 	var guessInput = document.getElementById("playerInput");
 	guessInput.onkeypress = handleKeyPress;
 	model.generateShipLocations();
+	clickEventTable();
 }
 function handleFireButton() 
 {
@@ -192,4 +207,10 @@ function handleKeyPress(e)
 		return false;
 	}
 }
+function clickFire(tableCell)
+{
+	fireOnPosition(tableCell);
+}
+
+
 window.onload = init;
